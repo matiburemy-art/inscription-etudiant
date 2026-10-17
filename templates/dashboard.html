@@ -28,6 +28,11 @@
         </table>
     </div>
 </div>
+{% if etudiant.edit_count == 0 %}
+<a href="/edit_profile" class="btn btn-warning">Modifier mes informations</a>
+{% else %}
+<p class="text-danger">Vous avez deja utilise votre modification unique.</p>
+{% endif %}
 {% else %}
 <div class="card card-pro card-blue">
     <div class="card-body">
