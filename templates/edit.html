@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modifier Etudiant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5" style="max-width:600px">
+    <h3>Modifier {{ etudiant.prenom }} {{ etudiant.nom }}</h3>
+    <form method="POST">
+        <input name="nom" value="{{ etudiant.nom }}" class="form-control mb-2" placeholder="Nom">
+        <input name="prenom" value="{{ etudiant.prenom }}" class="form-control mb-2" placeholder="Prénom">
+        <input name="post_nom" value="{{ etudiant.post_nom }}" class="form-control mb-2" placeholder="Post-nom">
+        <input name="faculte" value="{{ etudiant.faculte }}" class="form-control mb-2" placeholder="Faculté">
+        <input name="filiere" value="{{ etudiant.filiere }}" class="form-control mb-2" placeholder="Filière">
+        <input name="telephone" value="{{ etudiant.telephone }}" class="form-control mb-2" placeholder="Téléphone">
+        <input name="email" value="{{ etudiant.email }}" class="form-control mb-2" placeholder="Email">
+        <button class="btn btn-primary w-100">Enregistrer</button>
+    </form>
+    <a href="/admin_dashboard" class="btn btn-secondary mt-3">Retour Admin</a>
+</div>
+</body>
+</html>
