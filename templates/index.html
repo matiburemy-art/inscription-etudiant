@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero p-5 text-center shadow">
+    <h1 class="fw-bold">Bienvenue - Inscription en ligne</h1>
+    <p class="lead">Plateforme professionnelle pour étudiants UGL - Gestion Moderne</p>
+    <div class="mt-4">
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-pro btn-lg me-2 text-primary"><i class="bi bi-person-plus"></i> S'inscrire</a>
+        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-pro btn-lg"><i class="bi bi-box-arrow-in-right"></i> Se connecter</a>
+    </div>
+</div>
+
+<div class="row mt-4 g-3">
+    <div class="col-md-4"><div class="card card-pro card-blue p-4"><h4><i class="bi bi-lightning text-primary"></i> Rapide</h4><p class="mb-0 text-muted">Inscription en 2 minutes avec formulaire sécurisé</p></div></div>
+    <div class="col-md-4"><div class="card card-pro card-green p-4"><h4><i class="bi bi-shield-check text-success"></i> Sécurisé</h4><p class="mb-0 text-muted">Données cryptées, mot de passe hashé</p></div></div>
+    <div class="col-md-4"><div class="card card-pro card-orange p-4"><h4><i class="bi bi-people text-warning"></i> Admin</h4><p class="mb-0 text-muted">Tableau de bord admin avec lecture seule</p></div></div>
+</div>
+{% endblock %}

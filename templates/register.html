@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card card-pro card-orange">
+            <div class="card-body p-4">
+                <h2 class="mb-4 fw-bold"><i class="bi bi-pencil-square text-warning"></i> Inscription Étudiant - UGL</h2>
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold bg-light px-2 rounded">ID (Etudiant)</label>
+                            <input type="text" name="username" class="form-control border-2" placeholder="Ex: UGL-2026-N" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Téléphone</label>
+                            <input type="text" name="telephone" class="form-control border-2" placeholder="+257..." required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Nom</label><input type="text" name="nom" class="form-control" placeholder="Tapez votre nom" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Prénom</label><input type="text" name="prenom" class="form-control" placeholder="Tapez votre prenom"required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Post-nom</label><input type="text" name="post_nom" class="form-control" placeholder="Tapez votre nost-nom"required></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Date de naissance</label><input type="date" name="date_naissance" class="form-control" placeholder="Tapez votre date" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Pays / Nationalité</label><input type="text" name="nationalite" class="form-control" placeholder="Tapez votre pays/nationalite" placeholder="Tapez votre pays ou nationalite" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Email (Gmail existant)</label><input type="email" name="email" class="form-control" placeholder="Tapez votre e-mail" required></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Faculté</label>
+                            <select name="faculte" class="form-select border-2" required>
+                                <option value=""> Choisir faculté </option>
+                                <option value="Sciences">Sciences</option>
+                                <option value="Informatique">Informatique</option>
+                                <option value="Médecine">Médecine</option>
+                                <option value="Droit">Droit</option>
+                                <option value="Économie">Économie</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Filière</label><input type="text" name="filiere" class="form-control" placeholder="Ex: Génie Logiciel" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Mot de passe</label><input type="password" name="password" class="form-control border-2" placeholder="Tapez votre password"required></div>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 btn-pro btn-lg text-dark fw-bold"><i class="bi bi-check-circle"></i> S'inscrire</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
