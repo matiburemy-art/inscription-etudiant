@@ -1,58 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-{% if is_admin %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="fw-bold"><i class="bi bi-table text-primary"></i> Liste des Étudiants Inscrits</h2>
-    <span class="badge bg-secondary fs-6"><i class="bi bi-lock-fill"></i> Lecture seule - {{ etudiants|length }} étudiants</span>
-</div>
-<div class="card card-pro p-0 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover table-striped mb-0">
-            <thead>
-                <tr><th>ID</th><th>Nom complet</th><th>Post-nom</th><th>Nationalité</th><th>Faculté</th><th>Email</th><th>Tél</th><th><i class="bi bi-lock"></i></th></tr>
-            </thead>
-            <tbody>
-                {% for etu in etudiants %}
-                <tr>
-                    <td><span class="badge-id">{{ etu.username }}</span></td>
-                    <td><b>{{ etu.nom }}</b> {{ etu.prenom }}</td>
-                    <td>{{ etu.post_nom }}</td>
-                    <td><span class="badge bg-light text-dark border">{{ etu.nationalite }}</span></td>
-                    <td><span class="badge bg-primary">{{ etu.faculte }}</span></td>
-                    <td>{{ etu.email }}</td>
-                    <td>{{ etu.telephone }}</td>
-                    <td><i class="bi bi-lock-fill text-danger"></i></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container mt-4">
+  <div class="card shadow-lg p-4" style="border-left:5px solid #0d47a1; border-radius:15px">
+    <h4 class="mb-4"><i class="bi bi-person-circle"></i> Mon Profil - {{ etudiant.nom }} {{ etudiant.prenom }}</h4>
+
+    <div class="bg-light p-3 rounded mb-2"><b>ID:</b> <span class="badge bg-primary" style="background:#d0e3ff !important; color:#0d47a1; padding:6px 12px; border-radius:20px">{{ etudiant.username }}</span></div>
+    <div class="bg-light p-3 rounded mb-2"><b>Nom:</b> {{ etudiant.nom }} {{ etudiant.prenom }} {{ etudiant.post_nom }}</div>
+    <div class="bg-light p-3 rounded mb-2"><b>Nationalité:</b> {{ etudiant.nationalite }}</div>
+    <div class="bg-light p-3 rounded mb-2"><b>Faculté:</b> <span class="badge bg-primary">{{ etudiant.faculte }}</span> - {{ etudiant.filiere }}</div>
+    <div class="bg-light p-3 rounded mb-2"><b>Email:</b> {{ etudiant.email }}</div>
+    <div class="bg-light p-3 rounded mb-2"><b>Téléphone:</b> {{ etudiant.telephone }}</div>
+
+    <div class="mt-4">
+      <!-- LOGIQUE : 1 SEULE MODIFICATION -->
+      {% if etudiant.edit_count == 0 %}
+        <a href="/edit_profile" class="btn btn-warning me-2">✏️ Modifier mes informations</a>
+        <small class="text-muted">Vous pouvez modifier une seule fois</small>
+      {% else %}
+        <div class="alert alert-danger p-2">Vous avez déjà modifié votre profil. Vous ne pouvez plus modifier. Contactez l'admin.</div>
+      {% endif %}
+      
+      <a href="/logout" class="btn btn-danger mt-2" style="background:#dc3545; border-radius:10px; padding:10px 20px">⎋ Déconnexion</a>
     </div>
+  </div>
+
+  <p class="text-center mt-5 text-muted">© 2026 UGL - Inscription Étudiant | Système Pro</p>
 </div>
-{% if etudiant.edit_count == 0 %}
-<a href="/edit_profile" class="btn btn-warning">Modifier mes informations</a>
-{% else %}
-<p class="text-danger">Vous avez deja utilise votre modification unique.</p>
-{% endif %}
-{% else %}
-<div class="card card-pro card-blue">
-    <div class="card-body">
-        <h2 class="fw-bold"><i class="bi bi-person-circle"></i> Mon Profil - {{ etudiant.prenom }} {{ etudiant.nom }}</h2>
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="p-3 mb-2 bg-light rounded"><b>ID:</b> <span class="badge-id">{{ etudiant.username }}</span></div>
-                <div class="p-3 mb-2 bg-light rounded"><b>Nom:</b> {{ etudiant.nom }} {{ etudiant.post_nom }}</div>
-                <div class="p-3 mb-2 bg-light rounded"><b>Nationalité:</b> {{ etudiant.nationalite }}</div>
-            </div>
-            <div class="col-md-6">
-                <div class="p-3 mb-2 bg-light rounded"><b>Faculté:</b> <span class="badge bg-primary">{{ etudiant.faculte }}</span> - {{ etudiant.filiere }}</div>
-                <div class="p-3 mb-2 bg-light rounded"><b>Email:</b> {{ etudiant.email }}</div>
-                <div class="p-3 mb-2 bg-light rounded"><b>Téléphone:</b> {{ etudiant.telephone }}</div>
-            </div>
-        </div>
-        <div class="mt-3">
-            <a href="/logout" class="btn btn-danger btn-pro"><i class="bi bi-box-arrow-left"></i> Déconnexion</a>
-        </div>
-    </div>
-</div>
-{% endif %}
 {% endblock %}
