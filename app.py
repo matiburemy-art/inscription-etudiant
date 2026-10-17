@@ -27,6 +27,7 @@ class Etudiant(UserMixin, db.Model):
     faculte = db.Column(db.String(50), nullable=False)
     filiere = db.Column(db.String(50), nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
+    edit_count = db.Column(db.Integer, default=0)  # NOUVEAU : compte le nombre de modifs
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -50,14 +51,10 @@ def register():
             return redirect(url_for('register'))
         nouvel_etudiant = Etudiant(
             username=username,
-            nom=request.form.get('nom'),
-            prenom=request.form.get('prenom'),
-            post_nom=request.form.get('post_nom'),
-            date_naissance=request.form.get('date_naissance'),
-            nationalite=request.form.get('nationalite'),
-            email=request.form.get('email'),
-            telephone=request.form.get('telephone'),
-            faculte=request.form.get('faculte'),
+            nom=request.form.get('nom'), prenom=request.form.get('prenom'),
+            post_nom=request.form.get('post_nom'), date_naissance=request.form.get('date_naissance'),
+            nationalite=request.form.get('nationalite'), email=request.form.get('email'),
+            telephone=request.form.get('telephone'), faculte=request.form.get('faculte'),
             filiere=request.form.get('filiere')
         )
         nouvel_etudiant.set_password(request.form.get('password'))
@@ -88,7 +85,30 @@ def login():
 def dashboard():
     return render_template('dashboard.html', etudiant=current_user)
 
-# --- PARTIE ADMIN SEULEMENT ---
+# --- ETUDIANT : MODIFIER 1 SEULE FOIS ---
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if current_user.edit_count >= 1:
+        flash("Vous avez deja modifie votre profil une fois. Vous ne pouvez plus modifier.", "danger")
+        return redirect(url_for('dashboard'))
+    
+    if request.method == 'POST':
+        current_user.nom = request.form.get('nom')
+        current_user.prenom = request.form.get('prenom')
+        current_user.post_nom = request.form.get('post_nom')
+        current_user.telephone = request.form.get('telephone')
+        current_user.email = request.form.get('email')
+        current_user.faculte = request.form.get('faculte')
+        current_user.filiere = request.form.get('filiere')
+        current_user.edit_count = 1  # Bloque apres 1 modif
+        db.session.commit()
+        flash("Profil modifie avec succes ! Vous ne pourrez plus modifier.", "success")
+        return redirect(url_for('dashboard'))
+    
+    return render_template('edit_profile.html', etudiant=current_user)
+
+# --- ADMIN : MODIF INFINIE ---
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if not session.get('is_admin'):
@@ -98,19 +118,16 @@ def admin_dashboard():
 
 @app.route('/admin/delete/<int:id>')
 def delete_etudiant(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
+    if not session.get('is_admin'): return redirect(url_for('login'))
     etudiant = Etudiant.query.get(id)
     if etudiant:
         db.session.delete(etudiant)
         db.session.commit()
-        flash('Etudiant supprime', 'success')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
 def edit_etudiant(id):
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
+    if not session.get('is_admin'): return redirect(url_for('login'))
     etudiant = Etudiant.query.get(id)
     if request.method == 'POST':
         etudiant.nom = request.form.get('nom')
@@ -121,7 +138,6 @@ def edit_etudiant(id):
         etudiant.telephone = request.form.get('telephone')
         etudiant.email = request.form.get('email')
         db.session.commit()
-        flash('Modifie avec succes', 'success')
         return redirect(url_for('admin_dashboard'))
     return render_template('edit.html', etudiant=etudiant)
 
