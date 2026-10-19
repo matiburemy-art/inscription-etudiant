@@ -14,18 +14,24 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Téléphone</label>
-                            <input type="text" name="telephone" class="form-control border-2" placeholder="+257..." required>
+                            <input type="text" name="telephone" class="form-control border-2" placeholder="Entrez votre numéro ex: +257..." required>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Nom</label><input type="text" name="nom" class="form-control" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Prénom</label><input type="text" name="prenom" class="form-control" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Post-nom</label><input type="text" name="post_nom" class="form-control" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Nom</label><input type="text" name="nom" class="form-control" placeholder="Entrez votre nom" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Prénom</label><input type="text" name="prenom" class="form-control" placeholder="Entrez votre prénom" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Post-nom</label><input type="text" name="post_nom" class="form-control" placeholder="Entrez votre post-nom" required></div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Date de naissance</label><input type="date" name="date_naissance" class="form-control" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Pays / Nationalité</label><input type="text" name="nationalite" class="form-control" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Email</label><input type="email" name="email" class="form-control" required></div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Pays / Nationalité</label>
+                            <select name="nationalite" class="form-control border-2" required>
+                                <option value="">Choisissez votre pays</option>
+                                <option>Burundi</option><option>Rwanda</option><option>RDC - Congo</option><option>Tanzanie</option><option>Ouganda</option><option>Kenya</option><option>Cameroun</option><option>Sénégal</option><option>Côte d'Ivoire</option><option>Bénin</option><option>Togo</option><option>Mali</option><option>Guinée</option><option>Burkina Faso</option><option>Niger</option><option>Tchad</option><option>Gabon</option><option>Congo Brazzaville</option><option>Afrique du Sud</option><option>Maroc</option><option>Algérie</option><option>Tunisie</option><option>Egypte</option><option>Ethiopie</option><option>France</option><option>Belgique</option><option>Canada</option><option>USA</option><option>Autre</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Email</label><input type="email" name="email" class="form-control" placeholder="Entrez votre email" required></div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
@@ -45,7 +51,13 @@
                                 <option value="">Choisis d'abord une faculté</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Mot de passe</label><input type="password" name="password" class="form-control border-2" required></div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Mot de passe</label>
+                            <div class="input-group">
+                                <input type="password" name="password" id="pwd_reg" class="form-control border-2" placeholder="Entrez votre mot de passe" required>
+                                <span class="input-group-text" onclick="togglePwd('pwd_reg')" style="cursor:pointer">👁️</span>
+                            </div>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold"><i class="bi bi-check-circle"></i> S'inscrire</button>
                 </form>
@@ -63,5 +75,6 @@ function updateFilieres(){
   fil.innerHTML='<option value="">Choisir filière</option>';
   filieresParFaculte[fac].forEach(f=>{let o=document.createElement("option");o.value=f;o.textContent=f;fil.appendChild(o);});
 }
+function togglePwd(id){ let x=document.getElementById(id); x.type = x.type==="password" ? "text" : "password"; }
 </script>
 {% endblock %}
