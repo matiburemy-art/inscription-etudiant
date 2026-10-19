@@ -102,8 +102,11 @@ def register():
         db.session.commit()
         flash('Compte cree avec succes !', 'success')
         return redirect(url_for('login'))
-    return render_template('register.html')@app.route('/login', methods=['GET', 'POST'])
+    return render_template('register.html')
+    
+ @app.route('/login', methods=['GET', 'POST'])
 def login():
+        
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
