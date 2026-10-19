@@ -1,3 +1,4 @@
+from datatime import datatime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -17,11 +18,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-with app.app_context():
+with app.app_context
+    db.drop_all()
     db.create_all()
     
 class Etudiant(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    matricule = db.column(db.string(20), unique=True)
+    nom = db.column(db.string(100))
     username = db.Column(db.String(50), unique=True, nullable=False)
     nom = db.Column(db.String(50), nullable=False)
     prenom = db.Column(db.String(50), nullable=False)
@@ -64,7 +68,28 @@ def register():
             filiere=request.form.get('filiere')
         )
         nouvel_etudiant.set_password(request.form.get('password'))
-        db.session.add(nouvel_etudiant)
+        # Fonction pour générer le matricule
+def generer_matricule():
+    annee = datetime.now().year
+    dernier = Etudiant.query.filter(Etudiant.matricule.like(f"UGL-{annee}-%")).order_by(Etudiant.id.desc()).first()
+    if dernier and dernier.matricule:
+        try:
+            num = int(dernier.matricule.split("-")[-1]) + 1
+        except:
+            num = 1
+    else:
+        num = 1
+    return f"UGL-{annee}-{num:04d}"
+
+# ... dans ta fonction d'inscription
+    matricule_auto = generer_matricule()
+    nouvel_etudiant = Etudiant(
+        matricule=matricule_auto,  # <--- AJOUTE CECI
+        nom=request.form['nom'],
+        # ... tes autres champs
+    )
+    db.session.add(nouvel_etudiant)
+    db.session.commit()        db.session.add(nouvel_etudiant)
         db.session.commit()
         flash('Compte cree avec succes !', 'success')
         return redirect(url_for('login'))
