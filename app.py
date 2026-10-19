@@ -18,10 +18,13 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-with app.app_context()
+with app.app_context():
     db.drop_all()
     db.create_all()
-    
+
+
+
+
 class Etudiant(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     matricule = db.column(db.string(20), unique=True)
