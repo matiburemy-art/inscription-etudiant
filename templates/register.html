@@ -29,16 +29,55 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Faculté</label>
-                            <select name="faculte" class="form-select border-2" required>
-                                <option value=""> Choisir faculté </option>
-                                <option value="Sciences">Sciences</option>
-                                <option value="Informatique">Informatique</option>
-                                <option value="Médecine">Médecine</option>
-                                <option value="Droit">Droit</option>
-                                <option value="Économie">Économie</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Filière</label><input type="text" name="filiere" class="form-control" placeholder="Ex: Génie Logiciel" required></div>
+                           <div>
+  <label>Faculté</label>
+  <select name="faculte" id="faculte" onchange="updateFilieres()" required>
+    <option value="">Choisir faculté</option>
+    <option value="Sciences">Sciences</option>
+    <option value="Informatique">Informatique</option>
+    <option value="Médecine">Médecine</option>
+    <option value="Droit">Droit</option>
+    <option value="Économie">Économie</option>
+  </select>
+</div>
+
+<div>
+  <label>Filière</label>
+  <select name="filiere" id="filiere" required>
+    <option value="">Choisis d'abord une faculté</option>
+  </select>
+</div>
+
+<script>
+const filieresParFaculte = {
+  "Sciences": ["Mathématiques", "Physique", "Chimie", "Biologie"],
+  "Informatique": ["Génie Logiciel", "Réseaux et Systèmes", "Informatique de Gestion", "IA et Data"],
+  "Médecine": ["Médecine Générale", "Sciences Infirmières", "Laboratoire", "Pharmacie"],
+  "Droit": ["Droit Public", "Droit Privé", "Droit des Affaires"],
+  "Économie": ["Économie Générale", "Gestion", "Comptabilité", "Finance-Banque"]
+};
+
+function updateFilieres() {
+  const fac = document.getElementById("faculte").value;
+  const filSelect = document.getElementById("filiere");
+  filSelect.innerHTML = "";
+
+  if (!fac) {
+    filSelect.innerHTML = '<option value="">Choisis d\'abord une faculté</option>';
+    return;
+  }
+
+  const liste = filieresParFaculte[fac] || [];
+  filSelect.innerHTML = '<option value="">Choisir filière</option>';
+  liste.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f;
+    opt.textContent = f;
+    filSelect.appendChild(opt);
+  });
+}
+</script>
+                            
                         <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Mot de passe</label><input type="password" name="password" class="form-control border-2" placeholder="Tapez votre password"required></div>
                     </div>
                     <button type="submit" class="btn btn-warning w-100 btn-pro btn-lg text-dark fw-bold"><i class="bi bi-check-circle"></i> S'inscrire</button>
