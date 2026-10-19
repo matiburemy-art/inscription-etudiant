@@ -92,8 +92,7 @@ def generer_matricule():
         # ... tes autres champs
     )
     db.session.add(nouvel_etudiant)
-    db.session.commit()        db.session.add(nouvel_etudiant)
-        db.session.commit()
+    db.session.commit() 
         flash('Compte cree avec succes !', 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
