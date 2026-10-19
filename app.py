@@ -4,18 +4,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import traceback
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'votre_cle_secrete_super_securisee'
-
+app.config['SECRET_KEY'] = 'cle_super_secrete'
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
     database_url = database_url.replace("postgres://", "postgresql+psycopg2://", 1)
     database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///etudiants.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy()
 db.init_app(app)
 login_manager = LoginManager()
@@ -37,149 +35,107 @@ class Etudiant(UserMixin, db.Model):
     filiere = db.Column(db.String(50), nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     edit_count = db.Column(db.Integer, default=0)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    def set_password(self, p): self.password_hash = generate_password_hash(p)
+    def check_password(self, p): return check_password_hash(self.password_hash, p)
 
 @login_manager.user_loader
 def load_user(user_id):
     return Etudiant.query.get(int(user_id))
 
 def generer_matricule():
-    annee = datetime.now().year
-    dernier = Etudiant.query.filter(Etudiant.matricule.like(f"UGL-{annee}-%")).order_by(Etudiant.id.desc()).first()
-    if dernier and dernier.matricule:
-        try:
+    try:
+        annee = datetime.now().year
+        dernier = Etudiant.query.filter(Etudiant.matricule.like(f"UGL-{annee}-%")).order_by(Etudiant.id.desc()).first()
+        if dernier and dernier.matricule and "-" in dernier.matricule:
             num = int(dernier.matricule.split("-")[-1]) + 1
-        except:
-            num = 1
-    else:
-        num = 1
-    return f"UGL-{annee}-{num:04d}"
+        else:
+            # Si aucun etudiant, on compte le total
+            total = Etudiant.query.count()
+            num = total + 1
+        return f"UGL-{annee}-{num:04d}"
+    except Exception as e:
+        print(f"Erreur generer_matricule: {e}")
+        traceback.print_exc()
+        return f"UGL-{datetime.now().year}-0001"
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def index(): return render_template('index.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    # On génère le matricule pour l'AFFICHER dans l'interface
     matricule_preview = generer_matricule()
-    
     if request.method == 'POST':
         try:
-            # On regénère au moment du clic pour éviter les doublons
             matricule_final = generer_matricule()
-            username = matricule_final
-
             if Etudiant.query.filter_by(email=request.form.get('email')).first():
-                flash('Email deja utilise.', 'danger')
+                flash('Email deja utilise', 'danger')
                 return render_template('register.html', matricule_preview=matricule_preview)
-
-            nouvel_etudiant = Etudiant(
+            et = Etudiant(
                 matricule=matricule_final,
-                username=username,
-                nom=request.form.get('nom'),
-                prenom=request.form.get('prenom'),
-                post_nom=request.form.get('post_nom'),
-                date_naissance=request.form.get('date_naissance'),
-                nationalite=request.form.get('nationalite'),
-                email=request.form.get('email'),
-                telephone=request.form.get('telephone'),
-                faculte=request.form.get('faculte'),
+                username=matricule_final,
+                nom=request.form.get('nom'), prenom=request.form.get('prenom'),
+                post_nom=request.form.get('post_nom'), date_naissance=request.form.get('date_naissance'),
+                nationalite=request.form.get('nationalite'), email=request.form.get('email'),
+                telephone=request.form.get('telephone'), faculte=request.form.get('faculte'),
                 filiere=request.form.get('filiere')
             )
-            nouvel_etudiant.set_password(request.form.get('password'))
-            db.session.add(nouvel_etudiant)
+            et.set_password(request.form.get('password'))
+            db.session.add(et)
             db.session.commit()
-            flash(f'Compte cree ! Votre matricule est {matricule_final}.', 'success')
+            flash(f'Inscrit! Votre ID est {matricule_final}', 'success')
             return redirect(url_for('login'))
         except Exception as e:
-            print(f"ERREUR REGISTER: {e}")
             db.session.rollback()
-            flash(f'Erreur: {e}', 'danger')
+            print("ERREUR REGISTER POST:", e)
+            traceback.print_exc()
+            flash(f"Erreur interne: {e}", "danger")
             return render_template('register.html', matricule_preview=matricule_preview)
-
     return render_template('register.html', matricule_preview=matricule_preview)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == 'admin' and password == '2005':
+        u = request.form.get('username'); p = request.form.get('password')
+        if u == 'admin' and p == '2005':
             session['is_admin'] = True
             return redirect(url_for('admin_dashboard'))
-        etudiant = Etudiant.query.filter_by(username=username).first()
-        if etudiant and etudiant.check_password(password):
-            login_user(etudiant)
+        et = Etudiant.query.filter_by(username=u).first()
+        if et and et.check_password(p):
+            login_user(et)
             return redirect(url_for('dashboard'))
-        else:
-            flash('Nom ou mot de passe incorrect', 'danger')
+        flash('Identifiants incorrects', 'danger')
     return render_template('login.html')
 
 @app.route('/dashboard')
 @login_required
-def dashboard():
-    return render_template('dashboard.html', etudiant=current_user)
-
-@app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    if current_user.edit_count >= 1:
-        flash("Vous avez deja modifie une fois.", "danger")
-        return redirect(url_for('dashboard'))
-    if request.method == 'POST':
-        current_user.nom = request.form.get('nom')
-        current_user.prenom = request.form.get('prenom')
-        current_user.post_nom = request.form.get('post_nom')
-        current_user.telephone = request.form.get('telephone')
-        current_user.email = request.form.get('email')
-        current_user.faculte = request.form.get('faculte')
-        current_user.filiere = request.form.get('filiere')
-        current_user.edit_count = 1
-        db.session.commit()
-        return redirect(url_for('dashboard'))
-    return render_template('edit_profile.html', etudiant=current_user)
+def dashboard(): return render_template('dashboard.html', etudiant=current_user)
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if not session.get('is_admin'): return redirect(url_for('login'))
-    etudiants = Etudiant.query.all()
-    return render_template('admin_dashboard.html', etudiants=etudiants)
+    return render_template('admin_dashboard.html', etudiants=Etudiant.query.all())
 
 @app.route('/admin/delete/<int:id>')
 def delete_etudiant(id):
     if not session.get('is_admin'): return redirect(url_for('login'))
-    etudiant = Etudiant.query.get(id)
-    if etudiant:
-        db.session.delete(etudiant)
-        db.session.commit()
+    et = Etudiant.query.get(id)
+    if et: db.session.delete(et); db.session.commit()
     return redirect(url_for('admin_dashboard'))
-
-@app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
-def edit_etudiant(id):
-    if not session.get('is_admin'): return redirect(url_for('login'))
-    etudiant = Etudiant.query.get(id)
-    if request.method == 'POST':
-        etudiant.nom = request.form.get('nom')
-        etudiant.prenom = request.form.get('prenom')
-        etudiant.post_nom = request.form.get('post_nom')
-        etudiant.faculte = request.form.get('faculte')
-        etudiant.filiere = request.form.get('filiere')
-        etudiant.telephone = request.form.get('telephone')
-        etudiant.email = request.form.get('email')
-        db.session.commit()
-        return redirect(url_for('admin_dashboard'))
-    return render_template('edit.html', etudiant=etudiant)
 
 @app.route('/logout')
 def logout():
-    session.pop('is_admin', None)
-    logout_user()
+    session.pop('is_admin', None); logout_user()
     return redirect(url_for('index'))
+
+# Route pour REPARER ta base sur Render
+@app.route('/reset-db-ugl-2026')
+def reset_db():
+    try:
+        db.drop_all()
+        db.create_all()
+        return "Base effacee et recreee avec succes! Va sur /register maintenant."
+    except Exception as e:
+        return f"Erreur reset: {e}"
 
 with app.app_context():
     db.create_all()
