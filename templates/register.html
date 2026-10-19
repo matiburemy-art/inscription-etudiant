@@ -5,29 +5,30 @@
         <div class="card card-pro card-orange">
             <div class="card-body p-4">
                 <h2 class="mb-4 fw-bold"><i class="bi bi-pencil-square text-warning"></i> Inscription Étudiant - UGL</h2>
-                
-                <div style="background:#d1ecf1; border-left:4px solid #0dcaf0; padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <i class="bi bi-info-circle"></i> <strong>Matricule généré automatiquement</strong><br>
-                    Vous n'avez pas besoin de le saisir. Votre matricule sera créé comme : <b>UGL-2026-0001, UGL-2026-0002...</b> et servira à vous connecter.
-                </div>
-
                 <form method="POST">
                     <div class="row">
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Nom</label><input type="text" name="nom" class="form-control" placeholder="Tapez votre nom" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Prénom</label><input type="text" name="prenom" class="form-control" placeholder="Tapez votre prenom" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Post-nom</label><input type="text" name="post_nom" class="form-control" placeholder="Tapez votre post-nom" required></div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold bg-light px-2 rounded">ID (Etudiant)</label>
+                            <input type="text" class="form-control border-2 bg-light" value="{{ matricule_preview }}" disabled>
+                            <small class="text-muted">Généré automatiquement</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Téléphone</label>
+                            <input type="text" name="telephone" class="form-control border-2" placeholder="+257..." required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Nom</label><input type="text" name="nom" class="form-control" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Prénom</label><input type="text" name="prenom" class="form-control" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Post-nom</label><input type="text" name="post_nom" class="form-control" required></div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Date de naissance</label><input type="date" name="date_naissance" class="form-control" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Pays / Nationalité</label><input type="text" name="nationalite" class="form-control" placeholder="Tapez votre pays" required></div>
-                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Téléphone</label><input type="text" name="telephone" class="form-control border-2" placeholder="+257..." required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Pays / Nationalité</label><input type="text" name="nationalite" class="form-control" required></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Email</label><input type="email" name="email" class="form-control" required></div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3"><label class="form-label fw-semibold">Email (Gmail existant)</label><input type="email" name="email" class="form-control" placeholder="Tapez votre e-mail" required></div>
-                        <div class="col-md-6 mb-3"><label class="form-label fw-semibold">Mot de passe</label><input type="password" name="password" class="form-control border-2" placeholder="Tapez votre password" required></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Faculté</label>
                             <select name="faculte" id="faculte" class="form-control" onchange="updateFilieres()" required>
                                 <option value="">Choisir faculté</option>
@@ -38,45 +39,29 @@
                                 <option value="Économie">Économie</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Filière</label>
                             <select name="filiere" id="filiere" class="form-control" required>
                                 <option value="">Choisis d'abord une faculté</option>
                             </select>
                         </div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Mot de passe</label><input type="password" name="password" class="form-control border-2" required></div>
                     </div>
-                    <button type="submit" class="btn btn-warning w-100 btn-pro btn-lg text-dark fw-bold"><i class="bi bi-check-circle"></i> S'inscrire</button>
+                    <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold"><i class="bi bi-check-circle"></i> S'inscrire</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 <script>
-const filieresParFaculte = {
-  "Sciences": ["Mathématiques", "Physique", "Chimie", "Biologie"],
-  "Informatique": ["Génie Logiciel", "Réseaux et Systèmes", "Informatique de Gestion", "IA et Data"],
-  "Médecine": ["Médecine Générale", "Sciences Infirmières", "Laboratoire", "Pharmacie"],
-  "Droit": ["Droit Public", "Droit Privé", "Droit des Affaires"],
-  "Économie": ["Économie Générale", "Gestion", "Comptabilité", "Finance-Banque"]
-};
-
-function updateFilieres() {
-  const fac = document.getElementById("faculte").value;
-  const filSelect = document.getElementById("filiere");
-  filSelect.innerHTML = "";
-  if (!fac) {
-    filSelect.innerHTML = '<option value="">Choisis d\'abord une faculté</option>';
-    return;
-  }
-  const liste = filieresParFaculte[fac] || [];
-  filSelect.innerHTML = '<option value="">Choisir filière</option>';
-  liste.forEach(f => {
-    const opt = document.createElement("option");
-    opt.value = f;
-    opt.textContent = f;
-    filSelect.appendChild(opt);
-  });
+const filieresParFaculte = {"Sciences": ["Mathématiques","Physique","Chimie","Biologie"],"Informatique": ["Génie Logiciel","Réseaux et Systèmes","Informatique de Gestion","IA et Data"],"Médecine": ["Médecine Générale","Sciences Infirmières","Laboratoire","Pharmacie"],"Droit": ["Droit Public","Droit Privé","Droit des Affaires"],"Économie": ["Économie Générale","Gestion","Comptabilité","Finance-Banque"]};
+function updateFilieres(){
+  const fac=document.getElementById("faculte").value;
+  const fil=document.getElementById("filiere");
+  fil.innerHTML="";
+  if(!fac){fil.innerHTML='<option value="">Choisis d\'abord une faculté</option>';return;}
+  fil.innerHTML='<option value="">Choisir filière</option>';
+  filieresParFaculte[fac].forEach(f=>{let o=document.createElement("option");o.value=f;o.textContent=f;fil.appendChild(o);});
 }
 </script>
 {% endblock %}
