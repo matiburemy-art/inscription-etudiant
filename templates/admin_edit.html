@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg p-4" style="border-left:5px solid #ffc107; border-radius:15px">
+    <h3 class="mb-4 text-center">✏️ Modifier Étudiant - {{ etudiant.matricule }}</h3>
+    <form method="POST">
+        <div class="row">
+            <div class="col-md-4 mb-3"><label class="fw-bold">Nom</label><input type="text" name="nom" class="form-control" value="{{ etudiant.nom }}" required></div>
+            <div class="col-md-4 mb-3"><label class="fw-bold">Prénom</label><input type="text" name="prenom" class="form-control" value="{{ etudiant.prenom }}" required></div>
+            <div class="col-md-4 mb-3"><label class="fw-bold">Post-nom</label><input type="text" name="post_nom" class="form-control" value="{{ etudiant.post_nom }}" required></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label class="fw-bold">Téléphone</label><input type="text" name="telephone" class="form-control" value="{{ etudiant.telephone }}" required></div>
+            <div class="col-md-6 mb-3"><label class="fw-bold">Email</label><input type="email" name="email" class="form-control" value="{{ etudiant.email }}" required></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3"><label class="fw-bold">Nationalité</label><input type="text" name="nationalite" class="form-control" value="{{ etudiant.nationalite }}" required></div>
+            <div class="col-md-4 mb-3"><label class="fw-bold">Faculté</label><input type="text" name="faculte" class="form-control" value="{{ etudiant.faculte }}" required></div>
+            <div class="col-md-4 mb-3"><label class="fw-bold">Filière</label><input type="text" name="filiere" class="form-control" value="{{ etudiant.filiere }}" required></div>
+        </div>
+        <button class="btn btn-warning w-100 btn-lg fw-bold">Enregistrer</button>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary w-100 mt-2">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
