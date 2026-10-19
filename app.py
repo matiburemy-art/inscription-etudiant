@@ -68,16 +68,13 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username')
-        if Etudiant.query.filter_by(username=username).first():
-            flash('Cet ID est deja utilise.', 'danger')
-            return redirect(url_for('register'))
-        
+        matricule_auto = generer_matricule()
+        username = matricule_auto
+
         if Etudiant.query.filter_by(email=request.form.get('email')).first():
             flash('Email deja utilise.', 'danger')
             return redirect(url_for('register'))
 
-        matricule_auto = generer_matricule()
         nouvel_etudiant = Etudiant(
             matricule=matricule_auto,
             username=username,
@@ -94,7 +91,7 @@ def register():
         nouvel_etudiant.set_password(request.form.get('password'))
         db.session.add(nouvel_etudiant)
         db.session.commit()
-        flash(f'Compte cree avec succes ! Matricule: {matricule_auto}', 'success')
+        flash(f'Compte cree ! Votre matricule est {matricule_auto}. Utilisez-le pour vous connecter.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -123,7 +120,7 @@ def dashboard():
 @login_required
 def edit_profile():
     if current_user.edit_count >= 1:
-        flash("Vous avez deja modifie votre profil une fois. Vous ne pouvez plus modifier.", "danger")
+        flash("Vous avez deja modifie votre profil une fois.", "danger")
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
         current_user.nom = request.form.get('nom')
@@ -135,7 +132,7 @@ def edit_profile():
         current_user.filiere = request.form.get('filiere')
         current_user.edit_count = 1
         db.session.commit()
-        flash("Profil modifie avec succes ! Vous ne pourrez plus modifier.", "success")
+        flash("Profil modifie avec succes !", "success")
         return redirect(url_for('dashboard'))
     return render_template('edit_profile.html', etudiant=current_user)
 
