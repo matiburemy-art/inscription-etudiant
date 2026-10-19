@@ -142,13 +142,6 @@ def admin_dashboard():
     if not session.get('is_admin'): return redirect(url_for('login'))
     return render_template('admin_dashboard.html', etudiants=Etudiant.query.all())
 
-@app.route('/admin/delete/<int:id>')
-def delete_etudiant(id):
-    if not session.get('is_admin'): return redirect(url_for('login'))
-    et = Etudiant.query.get(id)
-    if et: db.session.delete(et); db.session.commit()
-    return redirect(url_for('admin_dashboard'))
-
 @app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
 def admin_edit_etudiant(id):
     if not session.get('is_admin'): return redirect(url_for('login'))
@@ -165,6 +158,13 @@ def admin_edit_etudiant(id):
         db.session.commit()
         return redirect(url_for('admin_dashboard'))
     return render_template('admin_edit.html', etudiant=et)
+    
+@app.route('/admin/delete/<int:id>')
+def delete_etudiant(id):
+    if not session.get('is_admin'): return redirect(url_for('login'))
+    et = Etudiant.query.get(id)
+    if et: db.session.delete(et); db.session.commit()
+    return redirect(url_for('admin_dashboard'))
     
 @app.route('/logout')
 def logout():
