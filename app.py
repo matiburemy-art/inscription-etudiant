@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import traceback
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.config['SECRET_KEY'] = 'cle_super_secrete'
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
@@ -166,5 +166,5 @@ def reset_db():
 with app.app_context():
     db.create_all()
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(debug=True)
