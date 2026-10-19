@@ -18,7 +18,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy()
 db.init_app(app)
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -41,7 +40,6 @@ class Etudiant(UserMixin, db.Model):
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
@@ -67,33 +65,44 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    # On génère le matricule pour l'AFFICHER dans l'interface
+    matricule_preview = generer_matricule()
+    
     if request.method == 'POST':
-        matricule_auto = generer_matricule()
-        username = matricule_auto
+        try:
+            # On regénère au moment du clic pour éviter les doublons
+            matricule_final = generer_matricule()
+            username = matricule_final
 
-        if Etudiant.query.filter_by(email=request.form.get('email')).first():
-            flash('Email deja utilise.', 'danger')
-            return redirect(url_for('register'))
+            if Etudiant.query.filter_by(email=request.form.get('email')).first():
+                flash('Email deja utilise.', 'danger')
+                return render_template('register.html', matricule_preview=matricule_preview)
 
-        nouvel_etudiant = Etudiant(
-            matricule=matricule_auto,
-            username=username,
-            nom=request.form.get('nom'),
-            prenom=request.form.get('prenom'),
-            post_nom=request.form.get('post_nom'),
-            date_naissance=request.form.get('date_naissance'),
-            nationalite=request.form.get('nationalite'),
-            email=request.form.get('email'),
-            telephone=request.form.get('telephone'),
-            faculte=request.form.get('faculte'),
-            filiere=request.form.get('filiere')
-        )
-        nouvel_etudiant.set_password(request.form.get('password'))
-        db.session.add(nouvel_etudiant)
-        db.session.commit()
-        flash(f'Compte cree ! Votre matricule est {matricule_auto}. Utilisez-le pour vous connecter.', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html')
+            nouvel_etudiant = Etudiant(
+                matricule=matricule_final,
+                username=username,
+                nom=request.form.get('nom'),
+                prenom=request.form.get('prenom'),
+                post_nom=request.form.get('post_nom'),
+                date_naissance=request.form.get('date_naissance'),
+                nationalite=request.form.get('nationalite'),
+                email=request.form.get('email'),
+                telephone=request.form.get('telephone'),
+                faculte=request.form.get('faculte'),
+                filiere=request.form.get('filiere')
+            )
+            nouvel_etudiant.set_password(request.form.get('password'))
+            db.session.add(nouvel_etudiant)
+            db.session.commit()
+            flash(f'Compte cree ! Votre matricule est {matricule_final}.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            print(f"ERREUR REGISTER: {e}")
+            db.session.rollback()
+            flash(f'Erreur: {e}', 'danger')
+            return render_template('register.html', matricule_preview=matricule_preview)
+
+    return render_template('register.html', matricule_preview=matricule_preview)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -120,7 +129,7 @@ def dashboard():
 @login_required
 def edit_profile():
     if current_user.edit_count >= 1:
-        flash("Vous avez deja modifie votre profil une fois.", "danger")
+        flash("Vous avez deja modifie une fois.", "danger")
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
         current_user.nom = request.form.get('nom')
@@ -132,21 +141,18 @@ def edit_profile():
         current_user.filiere = request.form.get('filiere')
         current_user.edit_count = 1
         db.session.commit()
-        flash("Profil modifie avec succes !", "success")
         return redirect(url_for('dashboard'))
     return render_template('edit_profile.html', etudiant=current_user)
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
+    if not session.get('is_admin'): return redirect(url_for('login'))
     etudiants = Etudiant.query.all()
     return render_template('admin_dashboard.html', etudiants=etudiants)
 
 @app.route('/admin/delete/<int:id>')
 def delete_etudiant(id):
-    if not session.get('is_admin'): 
-        return redirect(url_for('login'))
+    if not session.get('is_admin'): return redirect(url_for('login'))
     etudiant = Etudiant.query.get(id)
     if etudiant:
         db.session.delete(etudiant)
@@ -155,8 +161,7 @@ def delete_etudiant(id):
 
 @app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
 def edit_etudiant(id):
-    if not session.get('is_admin'): 
-        return redirect(url_for('login'))
+    if not session.get('is_admin'): return redirect(url_for('login'))
     etudiant = Etudiant.query.get(id)
     if request.method == 'POST':
         etudiant.nom = request.form.get('nom')
