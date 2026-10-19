@@ -18,7 +18,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-with app.app_context
+with app.app_context()
     db.drop_all()
     db.create_all()
     
