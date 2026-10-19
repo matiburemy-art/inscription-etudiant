@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import traceback
 
-app = Flask(__name__)
+app = Flask(_name_)
 app.config['SECRET_KEY'] = 'cle_super_secrete'
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
@@ -49,7 +49,6 @@ def generer_matricule():
         if dernier and dernier.matricule and "-" in dernier.matricule:
             num = int(dernier.matricule.split("-")[-1]) + 1
         else:
-            # Si aucun etudiant, on compte le total
             total = Etudiant.query.count()
             num = total + 1
         return f"UGL-{annee}-{num:04d}"
@@ -82,8 +81,8 @@ def register():
             et.set_password(request.form.get('password'))
             db.session.add(et)
             db.session.commit()
-            flash(f'Inscrit! Votre ID est {matricule_final}', 'success')
-            return redirect(url_for('login'))
+            # MODIF 1: On passe l'ID au login automatiquement
+            return redirect(url_for('login', matricule=matricule_final))
         except Exception as e:
             db.session.rollback()
             print("ERREUR REGISTER POST:", e)
@@ -94,6 +93,8 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # MODIF 2: Récupère le matricule qui vient de l'inscription
+    matricule_from_register = request.args.get('matricule', '')
     if request.method == 'POST':
         u = request.form.get('username'); p = request.form.get('password')
         if u == 'admin' and p == '2005':
@@ -104,11 +105,37 @@ def login():
             login_user(et)
             return redirect(url_for('dashboard'))
         flash('Identifiants incorrects', 'danger')
-    return render_template('login.html')
+    return render_template('login.html', matricule_prefill=matricule_from_register)
 
 @app.route('/dashboard')
 @login_required
 def dashboard(): return render_template('dashboard.html', etudiant=current_user)
+
+# MODIF 3: ROUTE QUI MANQUAIT - C'est pour ça que Modifier ne marchait pas !
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if current_user.edit_count >= 1:
+        flash("Vous avez déjà utilisé votre modification", "danger")
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        try:
+            current_user.nom = request.form.get('nom')
+            current_user.prenom = request.form.get('prenom')
+            current_user.post_nom = request.form.get('post_nom')
+            current_user.telephone = request.form.get('telephone')
+            current_user.email = request.form.get('email')
+            current_user.faculte = request.form.get('faculte')
+            current_user.filiere = request.form.get('filiere')
+            current_user.nationalite = request.form.get('nationalite')
+            current_user.edit_count = 1
+            db.session.commit()
+            flash("Profil modifié avec succès!", "success")
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur: {e}", "danger")
+    return render_template('edit_profile.html', etudiant=current_user)
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
@@ -127,7 +154,6 @@ def logout():
     session.pop('is_admin', None); logout_user()
     return redirect(url_for('index'))
 
-# Route pour REPARER ta base sur Render
 @app.route('/reset-db-ugl-2026')
 def reset_db():
     try:
@@ -140,5 +166,5 @@ def reset_db():
 with app.app_context():
     db.create_all()
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(debug=True)
