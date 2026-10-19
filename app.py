@@ -72,6 +72,7 @@ def register():
         )
         nouvel_etudiant.set_password(request.form.get('password'))
         # Fonction pour générer le matricule
+
 def generer_matricule():
     annee = datetime.now().year
     dernier = Etudiant.query.filter(Etudiant.matricule.like(f"UGL-{annee}-%")).order_by(Etudiant.id.desc()).first()
@@ -84,20 +85,24 @@ def generer_matricule():
         num = 1
     return f"UGL-{annee}-{num:04d}"
 
-# ... dans ta fonction d'inscription
-    matricule_auto = generer_matricule()
-    nouvel_etudiant = Etudiant(
-        matricule=matricule_auto,  # <--- AJOUTE CECI
-        nom=request.form['nom'],
-        # ... tes autres champs
-    )
-    db.session.add(nouvel_etudiant)
-    db.session.commit() 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        matricule_auto = generer_matricule()
+        nouvel_etudiant = Etudiant(
+            matricule=matricule_auto,
+            nom=request.form['nom'],
+            prenom=request.form['prenom'],
+            email=request.form['email'],
+            mot_de_passe=request.form['mot_de_passe'],
+            faculte=request.form['faculte'],
+            filiere=request.form['filiere']
+        )
+        db.session.add(nouvel_etudiant)
+        db.session.commit()
         flash('Compte cree avec succes !', 'success')
         return redirect(url_for('login'))
-    return render_template('register.html')
-
-@app.route('/login', methods=['GET', 'POST'])
+    return render_template('register.html')@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
