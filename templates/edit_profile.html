@@ -1,19 +1,37 @@
-<!DOCTYPE html>
-<html><head><title>Modifier mon profil</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head><body class="bg-light">
-<div class="container mt-4" style="max-width:600px">
-<h3>Corriger mes informations (1 seule fois)</h3>
-<p class="text-danger">Attention : Vous ne pourrez modifier qu'une seule fois !</p>
-<form method="POST">
-<input name="nom" value="{{ etudiant.nom }}" class="form-control mb-2">
-<input name="prenom" value="{{ etudiant.prenom }}" class="form-control mb-2">
-<input name="post_nom" value="{{ etudiant.post_nom }}" class="form-control mb-2">
-<input name="faculte" value="{{ etudiant.faculte }}" class="form-control mb-2">
-<input name="filiere" value="{{ etudiant.filiere }}" class="form-control mb-2">
-<input name="telephone" value="{{ etudiant.telephone }}" class="form-control mb-2">
-<input name="email" value="{{ etudiant.email }}" class="form-control mb-2">
-<button class="btn btn-primary w-100">Confirmer la modification</button>
-</form>
-<a href="/dashboard" class="btn btn-secondary mt-2">Retour</a>
-</div></body></html>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg p-4" style="border-left:5px solid #ffc107; border-radius:15px">
+    <h4 class="mb-4">✏️ Modifier mon profil</h4>
+    <form method="POST">
+        <div class="row">
+            <div class="col-md-4 mb-3"><label>Nom</label><input type="text" name="nom" class="form-control" value="{{ etudiant.nom }}" required></div>
+            <div class="col-md-4 mb-3"><label>Prénom</label><input type="text" name="prenom" class="form-control" value="{{ etudiant.prenom }}" required></div>
+            <div class="col-md-4 mb-3"><label>Post-nom</label><input type="text" name="post_nom" class="form-control" value="{{ etudiant.post_nom }}" required></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label>Téléphone</label><input type="text" name="telephone" class="form-control" value="{{ etudiant.telephone }}" required></div>
+            <div class="col-md-6 mb-3"><label>Email</label><input type="email" name="email" class="form-control" value="{{ etudiant.email }}" required></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label>Pays / Nationalité</label>
+                <select name="nationalite" class="form-control" required>
+                    <option selected>{{ etudiant.nationalite }}</option>
+                    <option>Burundi</option><option>Rwanda</option><option>RDC - Congo</option><option>Tanzanie</option><option>Ouganda</option><option>Kenya</option><option>Cameroun</option><option>Sénégal</option><option>Côte d'Ivoire</option><option>Bénin</option><option>Togo</option><option>Mali</option><option>Guinée</option><option>Burkina Faso</option><option>Niger</option><option>Tchad</option><option>Gabon</option><option>Congo Brazzaville</option><option>Afrique du Sud</option><option>Maroc</option><option>Algérie</option><option>Tunisie</option><option>Egypte</option><option>Ethiopie</option><option>France</option><option>Belgique</option><option>Canada</option><option>USA</option><option>Autre</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label>Faculté</label>
+                <select name="faculte" class="form-control" required>
+                    <option selected>{{ etudiant.faculte }}</option>
+                    <option>Sciences</option><option>Informatique</option><option>Médecine</option><option>Droit</option><option>Économie</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3"><label>Filière</label><input type="text" name="filiere" class="form-control" value="{{ etudiant.filiere }}" required></div>
+        </div>
+        <button class="btn btn-warning w-100 btn-lg fw-bold mt-3">Enregistrer la modification</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
