@@ -5,8 +5,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'votre_cle_secrete_super_securisee'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///etudiants.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+import os
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///etudiants.db'app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy()
 db.init_app(app)
