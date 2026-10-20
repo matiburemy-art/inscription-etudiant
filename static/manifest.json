@@ -1,7 +1,6 @@
 {
-  "name": "Université des Grands Lacs - UGL Burundi",
+  "name": "UGL - Inscription Etudiant",
   "short_name": "UGL",
-  "description": "Plateforme d'inscription UGL",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
