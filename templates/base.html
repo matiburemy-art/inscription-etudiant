@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <head>
+    <meta charset="UTF-8">
+    <title>UGL BURUNDI</title>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icon-192.png') }}">
+  </head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}UGL - INSCRIPTION EN LIGNE{% endblock %}</title>
@@ -33,6 +40,14 @@
             </div>
         </div>
     </nav>
+    <nav>
+        <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+          <img src="{{ url_for('static', filename='icon-192.png') }}" 
+               alt="UGL" 
+               style="height:40px; width:40px; border-radius:8px;">
+          <span>UGL - Inscription</span>
+        </a>
+      </nav>
 
     <div class="container my-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
