@@ -3,10 +3,12 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import session
 import os
 import traceback
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'ugl_2025_secret'
 app.config['SECRET_KEY'] = 'cle_super_secrete'
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
@@ -182,6 +184,45 @@ def reset_db():
 
 with app.app_context():
     db.create_all()
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        # ÉTAPE 2 : Il change le mot de passe
+        if 'new_password' in request.form:
+            email = session.get('reset_email')
+            if not email:
+                flash("Session expirée, recommence", "danger")
+                return redirect(url_for('forgot_password'))
+            
+            new_password = request.form.get('new_password')
+            confirm_password = request.form.get('confirm_password')
+
+            if new_password != confirm_password:
+                flash("Les mots de passe ne correspondent pas", "danger")
+                return render_template('reset_password.html', email=email)
+            
+            etudiant = Etudiant.query.filter_by(email=email).first()
+            if etudiant:
+                etudiant.password_hash = generate_password_hash(new_password)
+                db.session.commit()
+                session.pop('reset_email', None)
+                flash("Mot de passe réinitialisé avec succès !", "success")
+                return redirect(url_for('login'))
+            else:
+                flash("Compte non trouvé", "danger")
+                return redirect(url_for('forgot_password'))
+
+        # ÉTAPE 1 : Il entre son Gmail
+        elif 'email' in request.form:
+            email = request.form.get('email')
+            etudiant = Etudiant.query.filter_by(email=email).first()
+            if etudiant:
+                session['reset_email'] = email
+                return render_template('reset_password.html', email=email)
+            else:
+                flash("Aucun compte avec ce Gmail", "danger")
+
+    return render_template('forgot_password.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
