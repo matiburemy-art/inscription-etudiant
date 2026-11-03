@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Etudiants - UGL | Admin</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+    body{background:#f0f2f5;color:#1a1a1a}
+    /* HEADER */
+    .topbar{background:#0a1931;color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+    .topbar h1{font-size:19px;letter-spacing:.5px}
+    .topbar h1 span{color:#ffc107}
+    .topbar a{color:white;text-decoration:none;background:#1e3a5f;padding:8px 14px;border-radius:20px;font-size:13px}
+    .marquee-bar{background:#ffc107;color:#0a1931;padding:9px;font-weight:700;font-size:13px}
+    .container{max-width:1100px;margin:20px auto;padding:0 15px}
+    /* CARDS */
+    .card{background:white;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,.08);margin-bottom:20px}
+    .card h3{color:#0a1931;border-left:5px solid #ffc107;padding-left:10px;margin-bottom:15px;font-size:17px}
+    .search-row{display:flex;gap:10px;flex-wrap:wrap}
+    .search-row input{flex:1;min-width:220px;padding:13px 15px;border:1.5px solid #ddd;border-radius:10px;outline:none;font-size:15px}
+    .search-row input:focus{border-color:#0a1931}
+    .btn{padding:13px 22px;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px}
+    .btn-dark{background:#0a1931;color:white}
+    .btn-yellow{background:#ffc107;color:#0a1931}
+    .btn-red{background:#ffecec;color:#d63031}
+    /* PROFIL ETUDIANT */
+    .profil{display:none;background:linear-gradient(135deg,#0a1931,#1e3a5f);color:white;border-radius:16px;padding:22px;margin-top:20px}
+    .profil-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .avatar{width:70px;height:70px;background:#ffc107;color:#0a1931;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900}
+    .profil h2{font-size:21px}
+    .profil p{opacity:.9;font-size:13px;margin-top:4px}
+    .infos{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    .info{background:rgba(255,255,255,.12);padding:12px;border-radius:10px}
+    .info small{opacity:.7;display:block;font-size:11px;text-transform:uppercase}
+    .info b{font-size:14px}
+    /* FORM NOTE */
+    .form-note{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .form-note select,.form-note input{padding:12px;border:1.5px solid #ddd;border-radius:10px;flex:1;min-width:140px}
+    /* TABLE */
+    table{width:100%;border-collapse:collapse;margin-top:15px}
+    th{background:#0a1931;color:white;padding:12px;text-align:left;font-size:13px}
+    th:first-child{border-radius:10px 0 0 0} th:last-child{border-radius:0 10px 0 0}
+    td{padding:11px;border-bottom:1px solid #eee;font-size:14px}
+    tr:hover{background:#f9f9f9}
+    .badge{padding:5px 10px;border-radius:20px;font-weight:700;font-size:12px}
+    .badge-ok{background:#d4edda;color:#155724}
+    .badge-ko{background:#f8d7da;color:#721c24}
+    .empty{text-align:center;padding:25px;color:#888}
+    @media(max-width:700px){.infos{grid-template-columns:1fr 1fr}.topbar h1{font-size:15px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <h1>UGL <span>•</span> Notes Etudiants</h1>
+    <div>
+        <a href="/admin_dashboard"><i class="fa fa-arrow-left"></i> Dashboard</a>
+        <a href="/logout" style="background:#d63031;margin-left:5px">Déconnexion</a>
+    </div>
+</div>
+
+<div class="marquee-bar"><marquee>Bienvenu sur le site de l'UGL - Espace Admin • Recherche par matricule • Seul l'admin peut voir et modifier les notes</marquee></div>
+
+<div class="container">
+
+    <!-- RECHERCHE -->
+    <div class="card">
+        <h3><i class="fa fa-magnifying-glass"></i> 1. Chercher un étudiant par matricule</h3>
+        <div class="search-row">
+            <input type="text" id="mat" placeholder="Ex: UGL-2025-0001" onkeydown="if(event.key==='Enter') chercher()">
+            <button class="btn btn-dark" onclick="chercher()"><i class="fa fa-search"></i> Chercher</button>
+            <button class="btn btn-yellow" onclick="document.getElementById('mat').value=''; document.getElementById('profil').style.display='none'">Effacer</button>
+        </div>
+
+        <!-- PROFIL QUI APPARAIT -->
+        <div id="profil" class="profil">
+            <div class="profil-top">
+                <div class="avatar" id="avatar">N</div>
+                <div>
+                    <h2 id="nomComplet">--</h2>
+                    <p id="matriculeAff">--</p>
+                </div>
+                <div style="margin-left:auto;text-align:right">
+                    <div style="font-size:26px;font-weight:900;color:#ffc107" id="moyenne">--</div>
+                    <small>Moyenne</small>
+                </div>
+            </div>
+            <div class="infos">
+                <div class="info"><small>Faculté</small><b id="faculte">--</b></div>
+                <div class="info"><small>Filière</small><b id="filiere">--</b></div>
+                <div class="info"><small>Email</small><b id="email">--</b></div>
+                <div class="info"><small>Téléphone</small><b id="tel">--</b></div>
+                <div class="info"><small>Nationalité</small><b id="nat">--</b></div>
+                <div class="info"><small>Naissance</small><b id="naissance">--</b></div>
+            </div>
+        </div>
+
+        <div id="notfound" style="display:none;color:#d63031;margin-top:15px;font-weight:700"></div>
+    </div>
+
+    <!-- AJOUTER NOTE -->
+    <div class="card">
+        <h3><i class="fa fa-plus-circle"></i> 2. Ajouter une note</h3>
+        <div class="form-note">
+            <select id="cours">
+                <option>Programmation Web</option>
+                <option>Base de Données</option>
+                <option>Réseau Informatique</option>
+                <option>Mathématiques</option>
+                <option>Comptabilité</option>
+                <option>Droit Civil</option>
+                <option>Anglais</option>
+            </select>
+            <input id="note" type="number" min="0" max="20" step="0.5" placeholder="Note / 20  Ex: 15">
+            <button class="btn btn-dark" onclick="ajouter()"><i class="fa fa-floppy-disk"></i> Enregistrer</button>
+        </div>
+    </div>
+
+    <!-- TABLEAU -->
+    <div class="card">
+        <h3><i class="fa fa-table-list"></i> 3. Notes enregistrées</h3>
+        <table>
+            <thead><tr><th>Cours</th><th>Note /20</th><th>Statut</th><th style="text-align:right">Action</th></tr></thead>
+            <tbody id="tbodyNotes">
+                <tr><td colspan="4" class="empty">Cherche un matricule pour voir ses notes ici</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+let currentMat = "";
+async function chercher(){
+    currentMat = document.getElementById('mat').value.trim();
+    if(!currentMat) return alert('Entre un matricule d\'abord');
+    let res = await fetch('/api/chercher-etudiant/'+currentMat);
+    let data = await res.json();
+    let profil = document.getElementById('profil');
+    let nf = document.getElementById('notfound');
+    if(!data.found){
+        profil.style.display='none';
+        nf.style.display='block';
+        nf.innerHTML = "❌ Aucun étudiant trouvé avec le matricule : " + currentMat;
+        document.getElementById('tbodyNotes').innerHTML = '<tr><td colspan="4" class="empty">Aucun étudiant</td></tr>';
+        return;
+    }
+    nf.style.display='none';
+    profil.style.display='block';
+    let e = data.etudiant;
+    document.getElementById('avatar').innerText = e.nom.charAt(0);
+    document.getElementById('nomComplet').innerText = e.nom + " " + e.prenom + " " + e.post_nom;
+    document.getElementById('matriculeAff').innerText = "Matricule : " + e.matricule;
+    document.getElementById('faculte').innerText = e.faculte;
+    document.getElementById('filiere').innerText = e.filiere;
+    document.getElementById('email').innerText = e.email;
+    document.getElementById('tel').innerText = e.telephone;
+    document.getElementById('nat').innerText = e.nationalite;
+    document.getElementById('naissance').innerText = e.date_naissance;
+
+    // Moyenne + tableau
+    let tbody = document.getElementById('tbodyNotes');
+    if(data.notes.length===0){
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">Aucune note pour cet étudiant</td></tr>';
+        document.getElementById('moyenne').innerText = "0";
+    } else {
+        let total = 0;
+        let html = "";
+        data.notes.forEach(n=>{
+            total += n.note;
+            let badge = n.note >= 10 ? '<span class="badge badge-ok">Réussi</span>' : '<span class="badge badge-ko">Echec</span>';
+            html += `<tr><td><b>${n.cours}</b></td><td><b style="color:${n.note>=10?'green':'red'}">${n.note} / 20</b></td><td>${badge}</td><td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-yellow" style="padding:8px 12px" onclick="modifier(${n.id}, '${n.cours}', ${n.note})">Modifier</button><button class="btn btn-red" style="padding:8px 12px" onclick="suppr(${n.id})">Supprimer</button></td></tr>`;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('moyenne').innerText = (total/data.notes.length).toFixed(1) + " /20";
+    }
+}
+async function ajouter(){
+    if(!currentMat) return alert('Cherche d\'abord un étudiant avec son matricule');
+    let noteVal = document.getElementById('note').value;
+    if(noteVal==="" || noteVal<0 || noteVal>20) return alert('Note entre 0 et 20');
+    await fetch('/api/ajouter-note', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({matricule: currentMat, cours: document.getElementById('cours').value, note: noteVal})
+    });
+    document.getElementById('note').value = "";
+    chercher();
+}
+async function modifier(id, ancienCours, ancienneNote){
+    let nouveauCours = prompt("Modifier le cours :", ancienCours);
+    if(nouveauCours === null) return;
+    let nouvelleNote = prompt("Modifier la note (0-20) :", ancienneNote);
+    if(nouvelleNote === null || nouvelleNote === "") return;
+    if(nouvelleNote < 0 || nouvelleNote > 20) return alert('Note entre 0 et 20');
+
+    await fetch('/api/modifier-note/'+id, {
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({cours: nouveauCours, note: nouvelleNote})
+    });
+    alert('Note modifiée !');
+    chercher();
+}
+async function suppr(id){
+    if(!confirm('Supprimer cette note ?')) return;
+    await fetch('/api/supprimer-note/'+id, {method:'DELETE'});
+    chercher();
+}
+</script>
+</body>
+</html>
